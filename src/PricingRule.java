@@ -1,4 +1,4 @@
-public class PricingRule {
+public abstract class PricingRule {
 
     public abstract double calculatePrice(Order order);
 

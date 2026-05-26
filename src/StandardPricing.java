@@ -12,6 +12,11 @@ public class StandardPricing extends PricingRule{
 
     @Override
     public String getRuleName(){
-        return 
+        return
+    }
+
+    @Override
+    public String getDescription(){
+        return
     }
 }
