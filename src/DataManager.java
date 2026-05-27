@@ -16,6 +16,6 @@ public class DataManager {
     }
 
     public void importFromFile(){
-        
+
     }
 }

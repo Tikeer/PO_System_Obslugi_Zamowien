@@ -27,4 +27,9 @@ public class MenuItem {
     public String getCategory(){
         return this.category;
     }
+
+    @Override
+    public String toString(){
+        return this.name + " (" + this.category + ") - " + this.price + "zl";
+    }
 }
