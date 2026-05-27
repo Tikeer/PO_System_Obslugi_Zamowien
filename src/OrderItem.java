@@ -1,17 +1,17 @@
 public class OrderItem {
 
     private MenuItem menuItem;
-    private int quanity;
+    private int quantity;
     private String notes;
 
     public OrderItem(MenuItem menuItem, int quanity,String notes){
         this.menuItem = menuItem;
-        this.quanity = quanity;
+        this.quantity = quanity;
         this.notes = notes;
     }
 
     public double getUnitTotal(){
-        return this.menuItem.getPrice() * this.quanity;
+        return this.menuItem.getPrice() * this.quantity;
     }
 
     public MenuItem getMenuItem(){
@@ -19,10 +19,24 @@ public class OrderItem {
     }
 
     public int getQuanity(){
-        return this.quanity;
+        return this.quantity;
     }
 
     public String getNotes(){
         return this.notes;
+    }
+
+    //pozniej w javaSwing to sie zmieni
+    @Override
+    public String toString(){
+        String baseText = this.quantity + "x " + this.menuItem.getName();
+
+        if(this.notes != null && !this.notes.isEmpty()) {
+            baseText += " (" + this.notes + ")";
+        }
+
+        baseText += " - " + getUnitTotal() + "zl";
+
+        return baseText;
     }
 }

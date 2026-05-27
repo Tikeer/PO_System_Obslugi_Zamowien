@@ -27,7 +27,7 @@ public class MenuItem {
     public String getCategory(){
         return this.category;
     }
-
+    // pozniej w javaSwing to sie zmieni
     @Override
     public String toString(){
         return this.name + " (" + this.category + ") - " + this.price + "zl";
