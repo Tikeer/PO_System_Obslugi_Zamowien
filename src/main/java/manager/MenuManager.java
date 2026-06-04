@@ -1,13 +1,8 @@
 package manager;
 
-
 import model.MenuItem;
-
-
 import java.util.ArrayList;
-
 import java.util.List;
-
 
 public class MenuManager {
 
@@ -38,6 +33,10 @@ public class MenuManager {
 
         this.menuItems.remove(id);
 
+    }
+
+    public List<MenuItem> getAllItems(){
+        return this.menuItems;
     }
 
 

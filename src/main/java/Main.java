@@ -14,7 +14,8 @@ public class Main {
     }
 }
 */
-/*
+
+import manager.DataManager;
 import manager.MenuManager;
 import manager.OrderManager;
 import model.MenuItem;
@@ -27,8 +28,25 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
+        DataManager dataManager = new DataManager();
         MenuManager menuManager = new MenuManager();
         OrderManager orderManager = new OrderManager();
+
+        List<MenuItem> loadedMenu = dataManager.loadMenu();
+        if (loadedMenu.isEmpty()){
+            System.out.println("Generowanie domyslnego menu");
+
+            MenuItem pizza = new MenuItem(1, "Pizza Margherita", 32.0, "Główne");
+            MenuItem burger = new MenuItem(2, "Burger Wołowy", 28.0, "Główne");
+            MenuItem cola = new MenuItem(3, "Cola 0.5l", 8.0, "Napoje");
+            MenuItem pasta = new MenuItem(4, "Pasta Carbonara", 30.0, "Główne");
+
+            dataManager.saveMenu(menuManager.getAllItems());
+        }else {
+            for (MenuItem item : loadedMenu){
+                menuManager.addItem(item);
+            }
+        }
 
 
         MenuItem pizza = new MenuItem(1, "Pizza Margherita", 32.0, "Główne");
@@ -90,4 +108,3 @@ public class Main {
         System.out.println("--------------------------------------");
     }
 }
-*/
