@@ -2,6 +2,7 @@ package manager;
 
 import model.Order;
 import model.OrderStatus;
+import pricing.PricingRule;
 
 import java.util.ArrayList;
 import java.util.List;

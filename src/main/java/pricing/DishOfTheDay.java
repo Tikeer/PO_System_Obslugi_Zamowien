@@ -51,6 +51,6 @@ public class DishOfTheDay extends PricingRule {
                 .map(MenuItem::getName)
                 .collect(Collectors.joining(", "));
 
-        return "Promocja na wybrane dania";
+        return "Promocja na wybrane dania: " + itemNames;
     }
 }

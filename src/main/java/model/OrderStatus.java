@@ -1,6 +1,6 @@
 package model;
 
-enum OrderStatus {
+public enum OrderStatus {
     PENDING,
     IN_PROGRESS,
     COMPLETED,
