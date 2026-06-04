@@ -17,11 +17,11 @@ public class StandardPricing extends PricingRule {
 
     @Override
     public String getRuleName(){
-        return
+        return "Cennik Standardowy";
     }
 
     @Override
     public String getDescription(){
-        return
+        return "Podstawowa metoda naliczania opłat na podstawie cen produktów.";
     }
 }

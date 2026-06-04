@@ -1,5 +1,7 @@
 package model;
 
+import pricing.PricingRule;
+
 import java.util.ArrayList;
 import java.util.List;
 

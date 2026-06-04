@@ -1,7 +1,7 @@
 package pricing;
 
 import model.Order;
-
+/*
 public class ComboSet extends PricingRule {
 
     private double fixedPrice;
@@ -10,6 +10,7 @@ public class ComboSet extends PricingRule {
     public double calculatePrice(Order order) {
         return 0;
     }
+
 
     @Override
     public String getRuleName(){
@@ -21,3 +22,4 @@ public class ComboSet extends PricingRule {
         return
     }
 }
+*/
