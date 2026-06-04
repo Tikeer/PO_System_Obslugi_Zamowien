@@ -1,3 +1,8 @@
+package manager;
+
+import model.Order;
+import model.OrderStatus;
+
 import java.util.ArrayList;
 import java.util.List;
 

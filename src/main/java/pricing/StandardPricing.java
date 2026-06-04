@@ -1,4 +1,9 @@
-public class StandardPricing extends PricingRule{
+package pricing;
+
+import model.Order;
+import model.OrderItem;
+
+public class StandardPricing extends PricingRule {
 
     @Override
     public double calculatePrice(Order order){

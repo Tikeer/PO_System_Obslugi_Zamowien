@@ -1,3 +1,5 @@
+package model;
+
 public class MenuItem {
 
     private int ID;

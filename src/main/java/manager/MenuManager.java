@@ -1,3 +1,7 @@
+package manager;
+
+import model.MenuItem;
+
 import java.util.ArrayList;
 import java.util.List;
 

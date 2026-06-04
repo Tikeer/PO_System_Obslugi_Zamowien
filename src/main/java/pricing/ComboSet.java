@@ -1,6 +1,10 @@
-public class HappyHour extends PricingRule{
-    private double discount = 0.2;
+package pricing;
 
+import model.Order;
+
+public class ComboSet extends PricingRule {
+
+    private double fixedPrice;
 
     @Override
     public double calculatePrice(Order order) {

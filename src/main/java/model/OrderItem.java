@@ -1,10 +1,12 @@
+package model;
+
 public class OrderItem {
 
     private MenuItem menuItem;
     private int quantity;
     private String notes;
 
-    public OrderItem(MenuItem menuItem, int quanity,String notes){
+    public OrderItem(MenuItem menuItem, int quanity, String notes){
         this.menuItem = menuItem;
         this.quantity = quanity;
         this.notes = notes;

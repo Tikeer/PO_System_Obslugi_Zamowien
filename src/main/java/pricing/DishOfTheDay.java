@@ -1,6 +1,13 @@
-public class ComboSet extends PricingRule{
+package pricing;
 
-    private double fixedPrice;
+import model.MenuItem;
+import model.Order;
+
+import java.util.List;
+
+public class DishOfTheDay extends PricingRule {
+    private double discount;
+    private List<MenuItem> dailyItems;
 
     @Override
     public double calculatePrice(Order order) {

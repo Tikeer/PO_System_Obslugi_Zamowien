@@ -1,8 +1,10 @@
-import java.util.List;
+package pricing;
 
-public class DishOfTheDay extends PricingRule{
-    private double discount;
-    private List<MenuItem> dailyItems;
+import model.Order;
+
+public class HappyHour extends PricingRule {
+    private double discount = 0.2;
+
 
     @Override
     public double calculatePrice(Order order) {

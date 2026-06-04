@@ -1,12 +1,7 @@
+package model;
+
 import java.util.ArrayList;
 import java.util.List;
-
-enum OrderStatus {
-    PENDING,
-    IN_PROGRESS,
-    COMPLETED,
-    CANCELLED
-}
 
 public class Order {
 

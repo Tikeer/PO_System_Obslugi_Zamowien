@@ -1,3 +1,7 @@
+package pricing;
+
+import model.Order;
+
 public class StudentPromo extends PricingRule {
     private double discount = 0.35;
 
