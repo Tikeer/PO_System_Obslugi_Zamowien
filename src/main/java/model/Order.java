@@ -53,5 +53,8 @@ public class Order {
     public OrderStatus getOrderStatus(){
         return this.status;
     }
+
+    public long getCreatedAt() {return this.createdAt;}
+
 }
 

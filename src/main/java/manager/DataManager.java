@@ -14,13 +14,19 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import pricing.PricingRule;
+import pricing.PricingRuleAdapter;
+
 public class DataManager {
     private final String filePathOrders = "orders.json";
     private final String filePathMenu = "menu.json";
     private Gson gson;
 
     public DataManager(){
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(PricingRule.class, new PricingRuleAdapter())
+                .create();
     }
 
     public void saveOrder(List<Order> orders){
