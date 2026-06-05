@@ -28,3 +28,15 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignorowane foldery Mavena i skompilowany kod
+target/
+*.class
+
+# Ignorowane pliki konfiguracyjne środowiska IntelliJ
+.idea/
+*.iml
+
+# Ignorowane pliki z bazą danych (żeby każdy testował na swoich)
+orders.json
+menu.json

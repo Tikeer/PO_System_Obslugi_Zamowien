@@ -70,7 +70,7 @@ public class DataManager {
             Type listType = new TypeToken<ArrayList<MenuItem>>(){}.getType();
             List<MenuItem> loadedMenu = gson.fromJson(reader,listType);
 
-            if(loadedMenu == null){
+            if(loadedMenu == null || loadedMenu.isEmpty()){
                 return new ArrayList<>();
             }
 
