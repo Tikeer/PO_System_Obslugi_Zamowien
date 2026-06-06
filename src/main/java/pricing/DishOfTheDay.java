@@ -14,6 +14,8 @@ public class DishOfTheDay extends PricingRule {
 
     private List<MenuItem> dailyItems = new ArrayList<>();
 
+
+
     @Override
     public double calculatePrice(Order order) {
         double total = 0.0;
