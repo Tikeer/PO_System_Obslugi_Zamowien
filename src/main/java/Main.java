@@ -47,7 +47,7 @@ public class Main {
 
         SwingUtilities.invokeLater(() -> {
 
-            RestaurantGUI gui = new RestaurantGUI(menuManager, orderManager);
+            RestaurantGUI gui = new RestaurantGUI(menuManager, orderManager,dataManager);
             gui.setVisible(true);
         });
     }

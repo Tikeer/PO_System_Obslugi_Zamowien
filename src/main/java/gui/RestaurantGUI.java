@@ -1,5 +1,6 @@
 package gui;
 
+import manager.DataManager;
 import manager.MenuManager;
 import manager.OrderManager;
 import model.MenuItem;
@@ -11,6 +12,7 @@ import pricing.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.nio.channels.SelectableChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,7 @@ public class RestaurantGUI extends JFrame {
 
     private MenuManager menuManager;
     private OrderManager orderManager;
+    private DataManager dataManager;
 
 
     private DishOfTheDay activeDishOfTheDay = new DishOfTheDay();
@@ -39,9 +42,10 @@ public class RestaurantGUI extends JFrame {
     private JTextArea historyTextArea;
     private JLabel lblTotalRevenue, lblAvgOrderValue, lblCompletedCount, lblCancelledCount;
 
-    public RestaurantGUI(MenuManager menuManager, OrderManager orderManager) {
+    public RestaurantGUI(MenuManager menuManager, OrderManager orderManager,DataManager dataManager) {
         this.menuManager = menuManager;
         this.orderManager = orderManager;
+        this.dataManager = dataManager;
 
         setTitle("System Zarządzania Restauracją - Panel Główny");
         setSize(1100, 750);
@@ -57,12 +61,33 @@ public class RestaurantGUI extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        tabbedPane.addTab("🛒 Nowe Zamówienie (Kasa)", createPosPanel());
-        tabbedPane.addTab("🍳 Panel Kuchenny (Statusy)", createKitchenPanel());
-        tabbedPane.addTab("🗂️ Zarządzanie Menu", createMenuManagementPanel());
-        tabbedPane.addTab("📊 Statystyki i Historia", createStatsAndHistoryPanel());
+        tabbedPane.addTab("Kasa", createPosPanel());
+        tabbedPane.addTab("Panel Kuchenny", createKitchenPanel());
+        tabbedPane.addTab("Zarządzanie Menu", createMenuManagementPanel());
+        tabbedPane.addTab("Statystyki i Historia", createStatsAndHistoryPanel());
+
+        final int[] previousTab = {0};
 
         tabbedPane.addChangeListener(e -> {
+            int selectedIndex = tabbedPane.getSelectedIndex();
+
+            if(selectedIndex == 2){
+                JPasswordField passwordField = new JPasswordField(10);
+                int action = JOptionPane.showConfirmDialog(this,passwordField,"Podaj PIN menedżera:", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                String inputPin = new String(passwordField.getPassword());
+
+                if (action == JOptionPane.OK_OPTION && inputPin.equals("1234")){
+                    previousTab[0] = selectedIndex;
+                }else{
+                    JOptionPane.showMessageDialog(this,"Błędny PIN! Odmowa dostępu.", "Brak uprawnień", JOptionPane.ERROR_MESSAGE);
+                    SwingUtilities.invokeLater(() -> tabbedPane.setSelectedIndex(previousTab[0]));
+                    return;
+                }
+            }else{
+                previousTab[0] = selectedIndex;
+            }
+
             refreshKitchen();
             refreshHistoryAndStats();
         });
@@ -78,24 +103,32 @@ public class RestaurantGUI extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
 
-        JPanel selectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JPanel selectionPanel = new JPanel(new BorderLayout(10, 10));
         selectionPanel.setBorder(BorderFactory.createTitledBorder("Wybór produktów"));
 
         posMenuComboBox = new JComboBox<>();
         updateComboBoxData();
 
+        JComboBox<String> sizeBox = new JComboBox<>(new String[]{"Standard","Mała","Średnia","Duża"});
         JSpinner quantitySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 50, 1));
         JTextField notesField = new JTextField(15);
         JButton addToBasketButton = new JButton("Dodaj do koszyka ➕");
         addToBasketButton.setBackground(new Color(230, 245, 230));
 
-        selectionPanel.add(new JLabel("Produkt:"));
-        selectionPanel.add(posMenuComboBox);
-        selectionPanel.add(new JLabel("Ilość:"));
-        selectionPanel.add(quantitySpinner);
-        selectionPanel.add(new JLabel("Uwagi:"));
-        selectionPanel.add(notesField);
-        selectionPanel.add(addToBasketButton);
+        JPanel inputsPanel = new JPanel(new GridLayout(2, 4, 10, 2));
+
+        inputsPanel.add(new JLabel("Produkt:"));
+        inputsPanel.add(new JLabel("Rozmiar:"));
+        inputsPanel.add(new JLabel("Ilość:"));
+        inputsPanel.add(new JLabel("Uwagi:"));
+
+        inputsPanel.add(posMenuComboBox);
+        inputsPanel.add(sizeBox);
+        inputsPanel.add(quantitySpinner);
+        inputsPanel.add(notesField);
+
+        selectionPanel.add(inputsPanel, BorderLayout.CENTER);
+        selectionPanel.add(addToBasketButton, BorderLayout.EAST);
 
         panel.add(selectionPanel, BorderLayout.NORTH);
 
@@ -111,13 +144,13 @@ public class RestaurantGUI extends JFrame {
         JPanel southContainer = new JPanel(new BorderLayout(10, 10));
 
         JPanel promoPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        promoPanel.setBorder(BorderFactory.createTitledBorder("Gry i Promocje Losowe"));
+        promoPanel.setBorder(BorderFactory.createTitledBorder("Promocje Losowe"));
 
-        JButton randomizeDishButton = new JButton("Losuj Danie Dnia 🎲");
+        JButton randomizeDishButton = new JButton("Losuj Danie Dnia");
         JLabel dishInfoLabel = new JLabel("Aktywne danie dnia: Brak");
         dishInfoLabel.setForeground(Color.BLUE);
 
-        JButton randomizeComboButton = new JButton("Losuj Zestaw Combo 🍔");
+        JButton randomizeComboButton = new JButton("Losuj Zestaw Combo");
         JLabel comboInfoLabel = new JLabel("Aktywne combo: Brak");
         comboInfoLabel.setForeground(new Color(128, 0, 128));
 
@@ -161,11 +194,11 @@ public class RestaurantGUI extends JFrame {
 
         JPanel checkoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 
-        JButton removeFromBasketButton = new JButton("Usuń zaznaczone ❌");
+        JButton removeFromBasketButton = new JButton("Usuń zaznaczone ");
         removeFromBasketButton.setBackground(new Color(255, 204, 204));
 
-        JComboBox<String> pricingRulesCombo = new JComboBox<>(new String[]{"Standardowy / Automatyczny", "Promocja Studencka"});
-        JButton submitOrderButton = new JButton("Przekaż do kuchni 🛎️");
+        JComboBox<String> pricingRulesCombo = new JComboBox<>(new String[]{"Bez promocji", "Promocja Studencka"});
+        JButton submitOrderButton = new JButton("Przekaż do kuchni ");
         submitOrderButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         submitOrderButton.setBackground(new Color(204, 230, 255));
 
@@ -178,7 +211,7 @@ public class RestaurantGUI extends JFrame {
 
         checkoutPanel.add(removeFromBasketButton);
         checkoutPanel.add(new JSeparator(SwingConstants.VERTICAL));
-        checkoutPanel.add(new JLabel("Typ klienta:"));
+        checkoutPanel.add(new JLabel("Typ promocji:"));
         checkoutPanel.add(pricingRulesCombo);
         checkoutPanel.add(submitOrderButton);
 
@@ -189,9 +222,14 @@ public class RestaurantGUI extends JFrame {
         addToBasketButton.addActionListener(e -> {
             MenuItem selectedItem = (MenuItem) posMenuComboBox.getSelectedItem();
             if (selectedItem != null) {
-                currentBasketModel.addElement(new OrderItem(selectedItem, (int) quantitySpinner.getValue(), notesField.getText()));
+                String size = (String) sizeBox.getSelectedItem();
+                String rawNotes = notesField.getText();
+                String finalNotes = size.equals("Standard") ? rawNotes : "Rozmiar: " + size + (rawNotes.isEmpty() ? "" : ", " + rawNotes);
+
+                currentBasketModel.addElement(new OrderItem(selectedItem, (int) quantitySpinner.getValue(), finalNotes));
                 notesField.setText("");
                 quantitySpinner.setValue(1);
+                sizeBox.setSelectedIndex(0);
             }
         });
 
@@ -223,7 +261,7 @@ public class RestaurantGUI extends JFrame {
             finalOrder.changeStatus(OrderStatus.PENDING);
 
 
-            // dataManager.saveOrders(orderManager.getAllOrders());
+            dataManager.saveOrder(orderManager.getAllOrders());
 
 
             JOptionPane.showMessageDialog(this, "Zamówienie wysłane do kuchni!\nZastosowano regułę: "
@@ -251,8 +289,8 @@ public class RestaurantGUI extends JFrame {
         panel.add(new JScrollPane(kitchenList), BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton btnComplete = new JButton("Wydaj zamówienie ✅");
-        JButton btnCancel = new JButton("Anuluj zamówienie ❌");
+        JButton btnComplete = new JButton("Wydaj zamówienie ");
+        JButton btnCancel = new JButton("Anuluj zamówienie ");
 
         btnComplete.setBackground(new Color(204, 255, 204));
         btnCancel.setBackground(new Color(255, 204, 204));
@@ -261,7 +299,7 @@ public class RestaurantGUI extends JFrame {
             Order selectedOrder = kitchenList.getSelectedValue();
             if (selectedOrder != null) {
                 selectedOrder.changeStatus(OrderStatus.COMPLETED);
-                // dataManager.saveOrders(orderManager.getAllOrders());
+                dataManager.saveOrder(orderManager.getAllOrders());
                 refreshKitchen();
             }
         });
@@ -270,7 +308,7 @@ public class RestaurantGUI extends JFrame {
             Order selectedOrder = kitchenList.getSelectedValue();
             if (selectedOrder != null) {
                 selectedOrder.changeStatus(OrderStatus.CANCELLED);
-                // dataManager.saveOrders(orderManager.getAllOrders());
+                dataManager.saveOrder(orderManager.getAllOrders());
                 refreshKitchen();
             }
         });
@@ -289,39 +327,46 @@ public class RestaurantGUI extends JFrame {
         menuList = new JList<>(menuListModel);
         panel.add(new JScrollPane(menuList), BorderLayout.CENTER);
 
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 5));
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         formPanel.setBorder(BorderFactory.createTitledBorder("Zarządzanie menu"));
 
-        JTextField idField = new JTextField();
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
-        JTextField categoryField = new JTextField();
+        JComboBox categoryBox = new JComboBox<>(new String[]{"Główne","Napoje", "Przystawki", "Desery"});
 
-        formPanel.add(new JLabel("ID:"));
-        formPanel.add(idField);
+
         formPanel.add(new JLabel("Nazwa:"));
         formPanel.add(nameField);
         formPanel.add(new JLabel("Cena:"));
         formPanel.add(priceField);
         formPanel.add(new JLabel("Kategoria:"));
-        formPanel.add(categoryField);
+        formPanel.add(categoryBox);
 
-        JButton addButton = new JButton("Dodaj 💾");
-        JButton deleteButton = new JButton("Usuń 🗑️");
+        JButton addButton = new JButton("Dodaj");
+        JButton deleteButton = new JButton("Usuń️");
         deleteButton.setBackground(new Color(255, 230, 230));
 
         addButton.addActionListener(e -> {
             try {
-                int id = Integer.parseInt(idField.getText());
+                int newId = 1;
+                for(MenuItem item : menuManager.getAllItems()){
+                    if(item.getID() >= newId) {
+                        newId = item.getID() + 1;
+                    }
+                }
+
                 String name = nameField.getText();
                 double price = Double.parseDouble(priceField.getText());
-                String category = categoryField.getText();
+                String category = (String) categoryBox.getSelectedItem();
 
-                menuManager.addItem(new MenuItem(id, name, price, category));
-                // dataManager.saveMenu(menuManager.getAllItems());
+                menuManager.addItem(new MenuItem(newId, name, price, category));
+                dataManager.saveMenu(menuManager.getAllItems());
                 refreshMenuModels();
 
-                idField.setText(""); nameField.setText(""); priceField.setText(""); categoryField.setText("");
+                nameField.setText("");
+                priceField.setText("");
+                categoryBox.setSelectedIndex(0);
+
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Błędny format danych!", "Błąd", JOptionPane.ERROR_MESSAGE);
             }
@@ -330,8 +375,8 @@ public class RestaurantGUI extends JFrame {
         deleteButton.addActionListener(e -> {
             MenuItem selectedItem = menuList.getSelectedValue();
             if (selectedItem != null) {
-                menuManager.getAllItems().remove(selectedItem);
-                // dataManager.saveMenu(menuManager.getAllItems());
+                menuManager.removeItem(selectedItem.getID());
+                dataManager.saveMenu(menuManager.getAllItems());
                 refreshMenuModels();
             }
         });
