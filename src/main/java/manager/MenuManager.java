@@ -31,7 +31,7 @@ public class MenuManager {
 
     public void removeItem(int id) {
 
-        this.menuItems.remove(id);
+        this.menuItems.removeIf(item -> item.getID() == id);
 
     }
 

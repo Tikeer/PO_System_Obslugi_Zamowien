@@ -41,6 +41,7 @@ public class RestaurantGUI extends JFrame {
     private JTextArea historyTextArea;
     private JLabel lblTotalRevenue, lblAvgOrderValue, lblCompletedCount, lblCancelledCount;
 
+
     public RestaurantGUI(MenuManager menuManager, OrderManager orderManager,DataManager dataManager) {
         this.menuManager = menuManager;
         this.orderManager = orderManager;
