@@ -12,7 +12,6 @@ import pricing.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.nio.channels.SelectableChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +45,17 @@ public class RestaurantGUI extends JFrame {
         this.menuManager = menuManager;
         this.orderManager = orderManager;
         this.dataManager = dataManager;
+
+        try{
+            List<Order> savedOrders = dataManager.loadOrders();
+            if(savedOrders != null){
+                for(Order o : savedOrders){
+                    orderManager.getAllOrders().add(o);
+                }
+            }
+        }catch (Exception ex){
+            System.out.println("Nie znaleziono pliku orders.json lub baza jest pusta");
+        }
 
         setTitle("System Zarządzania Restauracją - Panel Główny");
         setSize(1100, 750);
@@ -223,10 +233,32 @@ public class RestaurantGUI extends JFrame {
             MenuItem selectedItem = (MenuItem) posMenuComboBox.getSelectedItem();
             if (selectedItem != null) {
                 String size = (String) sizeBox.getSelectedItem();
-                String rawNotes = notesField.getText();
-                String finalNotes = size.equals("Standard") ? rawNotes : "Rozmiar: " + size + (rawNotes.isEmpty() ? "" : ", " + rawNotes);
+                String category = selectedItem.getCategory();
 
-                currentBasketModel.addElement(new OrderItem(selectedItem, (int) quantitySpinner.getValue(), finalNotes));
+                double priceModification = 0;
+
+                if("Napoje".equalsIgnoreCase(category)){
+                    size = "Standard";
+                }else {
+                    if ("Standard".equals(size)){
+                        size="Mała";
+                    }
+
+                    if ("Średnia".equals(size)){
+                        priceModification = 5.0;
+                    }else if("Duża".equals(size)){
+                        priceModification = 10.0;
+                    }
+                }
+
+                double finalPrice = selectedItem.getPrice() + priceModification;
+                String finalName = selectedItem.getName() + " (" + size + ")";
+
+                MenuItem adjustedItem = new MenuItem(selectedItem.getID(),finalName,finalPrice,category);
+
+                String rawNotes = notesField.getText();
+                currentBasketModel.addElement(new OrderItem(adjustedItem, (int) quantitySpinner.getValue(), rawNotes));
+
                 notesField.setText("");
                 quantitySpinner.setValue(1);
                 sizeBox.setSelectedIndex(0);
