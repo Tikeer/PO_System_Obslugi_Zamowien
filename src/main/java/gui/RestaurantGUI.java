@@ -356,6 +356,20 @@ public class RestaurantGUI extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
+        JPanel searchPanel = new JPanel(new BorderLayout(5,5));
+        searchPanel.setBorder(BorderFactory.createTitledBorder("Wyszukiwarka produktów"));
+        JTextField searchField = new JTextField();
+        searchPanel.add(new JLabel(" Szukaj po nazwie kategorii: "), BorderLayout.WEST);
+        searchPanel.add(searchField, BorderLayout.CENTER);
+
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e){
+                refreshMenuModels(searchField.getText());
+            }
+        });
+        panel.add(searchPanel,BorderLayout.NORTH);
+
         menuList = new JList<>(menuListModel);
         panel.add(new JScrollPane(menuList), BorderLayout.CENTER);
 
@@ -374,9 +388,24 @@ public class RestaurantGUI extends JFrame {
         formPanel.add(new JLabel("Kategoria:"));
         formPanel.add(categoryBox);
 
+        menuList.addListSelectionListener(e ->{
+            if(!e.getValueIsAdjusting()){
+                MenuItem selected = menuList.getSelectedValue();
+                if(selected != null){
+                    nameField.setText(selected.getName());
+                    priceField.setText(String.valueOf(selected.getPrice()));
+                    categoryBox.setSelectedItem(selected.getCategory());
+                }
+            }
+        });
+
         JButton addButton = new JButton("Dodaj");
+        JButton editButton = new JButton("Edytuj");
         JButton deleteButton = new JButton("Usuń️");
+
         deleteButton.setBackground(new Color(255, 230, 230));
+        editButton.setBackground(new Color(255,255,204));
+        addButton.setBackground(new Color(204,255,204));
 
         addButton.addActionListener(e -> {
             try {
@@ -393,14 +422,42 @@ public class RestaurantGUI extends JFrame {
 
                 menuManager.addItem(new MenuItem(newId, name, price, category));
                 dataManager.saveMenu(menuManager.getAllItems());
+
+                searchField.setText("");
                 refreshMenuModels();
 
                 nameField.setText("");
                 priceField.setText("");
                 categoryBox.setSelectedIndex(0);
 
+                JOptionPane.showMessageDialog(this,"Dodano nowa pozycje");
+
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Błędny format danych!", "Błąd", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        editButton.addActionListener(e ->{
+            MenuItem selectedItem = menuList.getSelectedValue();
+            if(selectedItem != null){
+                try{
+                    String name = nameField.getText();
+                    Double price = Double.parseDouble(priceField.getText());
+                    String category = (String) categoryBox.getSelectedItem();
+
+                    selectedItem.setName(name);
+                    selectedItem.setPrice(price);
+                    selectedItem.setCategory(category);
+
+                    dataManager.saveMenu(menuManager.getAllItems());
+                    refreshMenuModels(searchField.getText());
+
+                    JOptionPane.showMessageDialog(this,"Pomyslnie zaktualizowane dane produktu");
+                }catch (NumberFormatException ex){
+                    JOptionPane.showMessageDialog(this,"Błąd, wpisz poprawna cene.","Bład",JOptionPane.ERROR_MESSAGE);
+                }
+            }else {
+                JOptionPane.showMessageDialog(this,"Najpierw zaznacz pozycje ktora chcesz edytowac","Ostrzeżnie",JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -409,14 +466,29 @@ public class RestaurantGUI extends JFrame {
             if (selectedItem != null) {
                 menuManager.removeItem(selectedItem.getID());
                 dataManager.saveMenu(menuManager.getAllItems());
+
+                searchField.setText("");
                 refreshMenuModels();
+
+                nameField.setText("");
+                priceField.setText("");
+                categoryBox.setSelectedIndex(0);
+
+                JOptionPane.showMessageDialog(this,"Usunieto ozycje z menu");
+            }else {
+                JOptionPane.showMessageDialog(this,"Najpierw zaznacz pozycje ktora chcesz edytowac","Ostrzeżnie",JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        formPanel.add(deleteButton);
-        formPanel.add(addButton);
-        panel.add(formPanel, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel(new GridLayout(1,3,5,5));
+        buttonPanel.add(addButton);
+        buttonPanel.add(editButton);
+        buttonPanel.add(deleteButton);
 
+        formPanel.add(new JLabel(""));
+        formPanel.add(buttonPanel);
+
+        panel.add(formPanel, BorderLayout.SOUTH);
         return panel;
     }
 
@@ -456,10 +528,21 @@ public class RestaurantGUI extends JFrame {
         return panel;
     }
 
-    private void refreshMenuModels() {
+    private void refreshMenuModels(){
+        refreshMenuModels("");
+    }
+
+    private void refreshMenuModels(String filter){
         menuListModel.clear();
-        for (MenuItem item : menuManager.getAllItems()) {
-            menuListModel.addElement(item);
+        String query = filter.toLowerCase().trim();
+
+        for (MenuItem item : menuManager.getAllItems()){
+            boolean matchesName = item.getName().toLowerCase().contains(query);
+            boolean matchesCategory = item.getCategory().toLowerCase().contains(query);
+
+            if(query.isEmpty() || matchesName || matchesCategory){
+                menuListModel.addElement(item);
+            }
         }
         updateComboBoxData();
     }
